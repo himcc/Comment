@@ -1,0 +1,98 @@
+
+
+<div id="cc"><textarea id="target" width="80%"  onkeydown="keydown()"></textarea><input type="button" id="button1" onclick="postC()" value="POST" /></div>
+<div id="dd"></div>
+<script  type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script type="text/javascript">
+
+function keydown()
+{
+	var code=window.event.keyCode;
+	if(code==13)
+		postC();
+}
+
+var update = function(title,content){
+  var xmlhttp;
+  if (window.XMLHttpRequest){// code for IE7+, Firefox, Chrome, Opera, Safari
+    xmlhttp=new XMLHttpRequest();
+  }else{// code for IE6, IE5
+    xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+  }
+  
+  xmlhttp.onreadystatechange=function(){
+    if (xmlhttp.readyState==4){
+      //document.getElementById("content").innerHTML=xmlhttp.responseText;
+      if(xmlhttp.status==200){
+        //alert("POST OK")
+	//document.write(xmlhttp.responseText)
+        //$("#updated").css({"backgroundColor":oldcolor});
+        $("#target").val("")
+        getComments(p_url,0,10)
+      }else{
+        alert("POST ERROR")
+      }
+    }
+  };
+  xmlhttp.open("POST","/comment",true);
+  xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+  xmlhttp.send("title="+title+"&content="+content);
+};
+
+var postC = function (){
+  var content = encodeURIComponent($("#target").val())
+  if(content.length<1) return;
+  update(p_url,content)
+}
+var fenye = function (num){
+   var ret=""
+   var ye=parseInt(num/10);
+   if(ye<(num/10)){
+      ye++;
+   }
+   for(var i=1;i<=ye;++i){
+      ret+="<a href=\"#\" onClick=\"getComments('"+p_url+"',"+((i-1)*10)+",10); return false;\">["+i+"]</a> "
+   }
+   return ret;
+}
+var showComments = function(res){
+  var obj = $.parseJSON(res)
+  var comments = obj.comments;
+  var strC = "<hr>";
+  for(var i = 0 ;i<comments.length;i++){
+     strC+=decodeURIComponent(comments[i].body)+"<hr>";
+  } 
+  strC+=fenye(obj.totle)
+  document.getElementById("dd").innerHTML=strC;
+}
+var getComments = function(title,start,num){
+  var xmlhttp;
+  if (window.XMLHttpRequest){// code for IE7+, Firefox, Chrome, Opera, Safari
+    xmlhttp=new XMLHttpRequest();
+  }else{// code for IE6, IE5
+    xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+  }
+  
+  xmlhttp.onreadystatechange=function(){
+    if (xmlhttp.readyState==4){
+      //document.getElementById("content").innerHTML=xmlhttp.responseText;
+      if(xmlhttp.status==200){
+        //alert("POST OK")
+	//document.write(xmlhttp.responseText)
+        showComments(xmlhttp.responseText);
+        //$("#updated").css({"backgroundColor":oldcolor});
+      }else{
+        alert("get comments ERROR")
+      }
+    }
+  };
+  xmlhttp.open("GET","/comment?title="+title+"&start="+start+"&num="+num,true);
+  xmlhttp.send();
+}
+
+p_url=window.top.location;
+//document.write(p_url)
+//update(p_url,'test content...'+ new Date())
+//document.write("+++++++++++++++")
+getComments(p_url,0,10)
+</script>
