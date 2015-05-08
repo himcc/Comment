@@ -10,7 +10,26 @@ var mongoose = require('mongoose');
 // Connect to mongodb
 var connect = function () {
   var options = { server: { socketOptions: { keepAlive: 1 } } };
-  mongoose.connect("mongodb://localhost/comment", options, function (err, res) {
+  var dburi="mongodb://";
+  if(process.env.MONGODB_USERNAME){
+    dburi+=process.env.MONGODB_USERNAME;
+    if(process.env.MONGODB_PASSWORD){
+      dburi+=":"+process.env.MONGODB_PASSWORD;
+    }
+    dburi+="@";
+  }
+  if(process.env.MONGODB_PORT_27017_TCP_ADDR){
+    dburi+=process.env.MONGODB_PORT_27017_TCP_ADDR;
+  }else{
+    dburi+="localhost";
+  }
+  if(process.env.MONGODB_PORT_27017_TCP_PORT){
+    dburi+=":"+process.env.MONGODB_PORT_27017_TCP_PORT;
+  }else{
+    dburi+=":27017";
+  }
+  dburi+="/comment";
+  mongoose.connect(dburi, options, function (err, res) {
     if (err) { 
       console.log ('Mongodb connect error :' + err);
     } else {
