@@ -11,24 +11,28 @@ var mongoose = require('mongoose');
 var connect = function () {
   var options = { server: { socketOptions: { keepAlive: 1 } } };
   var dburi="mongodb://";
-  if(process.env.MONGODB_USERNAME){
-    dburi+=process.env.MONGODB_USERNAME;
-    if(process.env.MONGODB_PASSWORD){
-      dburi+=":"+process.env.MONGODB_PASSWORD;
+  if(process.env.MONGO_USERNAME){
+    dburi+=process.env.MONGO_USERNAME;
+    if(process.env.MONGO_PASSWORD){
+      dburi+=":"+process.env.MONGO_PASSWORD;
     }
     dburi+="@";
   }
-  if(process.env.MONGODB_PORT_27017_TCP_ADDR){
-    dburi+=process.env.MONGODB_PORT_27017_TCP_ADDR;
+  if(process.env.MONGO_PORT_27017_TCP_ADDR){
+    dburi+=process.env.MONGO_PORT_27017_TCP_ADDR;
   }else{
     dburi+="localhost";
   }
-  if(process.env.MONGODB_PORT_27017_TCP_PORT){
-    dburi+=":"+process.env.MONGODB_PORT_27017_TCP_PORT;
+  if(process.env.MONGO_PORT_27017_TCP_PORT){
+    dburi+=":"+process.env.MONGO_PORT_27017_TCP_PORT;
   }else{
     dburi+=":27017";
   }
-  dburi+="/comment";
+  if(process.env.MONGO_INSTANCE_NAME){
+    dburi+="/"+process.env.MONGO_INSTANCE_NAME;
+  }else{
+    dburi+="/comment";
+  }
   mongoose.connect(dburi, options, function (err, res) {
     if (err) { 
       console.log ('Mongodb connect error :' + err);
